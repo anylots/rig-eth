@@ -1,5 +1,7 @@
-use std::{collections::HashMap, str::FromStr, sync::Arc};
+use rig::{completion::ToolDefinition, tool::Tool};
+use std::{str::FromStr, sync::Arc};
 
+use crate::chains::get_chain_info;
 use alloy::{
     network::EthereumWallet,
     primitives::{Address, TxHash, B256, U256},
@@ -9,55 +11,10 @@ use alloy::{
     transports::http::{Client, Http},
 };
 use anyhow::{anyhow, Result};
-use rig::{completion::ToolDefinition, tool::Tool};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
-// configs
-pub const CHAIN_WITH_TOKENS: &str = r#"[  
-    {  
-        "chain": "ethereum",  
-        "provider_url": "https://eth-mainnet.g.alchemy.com/v2/YOUR-API-KEY",  
-        "tokens": {  
-            "USDC": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",  
-            "LINK": "0x514910771AF9Ca656af840dff83E8264EcF986CA"  
-        }  
-    },  
-    {  
-        "chain": "arbitrum",  
-        "provider_url": "https://arb-mainnet.g.alchemy.com/v2/YOUR-API-KEY",  
-        "tokens": {  
-            "USDC": "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8",  
-            "LINK": "0xf97f4df75117a78c1A5a0DBb814Af92458539FB4"  
-        }  
-    },
-    {  
-        "chain": "base",  
-        "provider_url": "http://localhost:8545",  
-        "tokens": {  
-            "USDC": "0x5FbDB2315678afecb367f032d93F642f64180aa3",  
-            "LINK": "0xf97f4df75117a78c1A5a0DBb814Af92458539FB4"  
-        }  
-    },
-    {  
-        "chain": "zksync",  
-        "provider_url": "https://arb-mainnet.g.alchemy.com/v2/YOUR-API-KEY",  
-        "tokens": {  
-            "USDC": "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8",  
-            "LINK": "0xf97f4df75117a78c1A5a0DBb814Af92458539FB4"  
-        }  
-    }
-]"#;
-
 const MAX_AMOUNT: u128 = 10u128.pow(5);
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct ChainWithTokens {
-    chain: String,
-    #[serde(skip_serializing)]
-    provider_url: String,
-    tokens: HashMap<String, String>, // token_symbol => token_address
-}
 
 #[derive(Deserialize)]
 pub struct TransferArgs {
@@ -143,13 +100,11 @@ impl Tool for ERC20Transfer {
             });
         }
 
-        let chain_tokens: Vec<ChainWithTokens> = serde_json::from_str(CHAIN_WITH_TOKENS).unwrap();
-        let provider_url = chain_tokens
-            .iter()
-            .find(|c| c.chain == chain_name)
-            .unwrap()
-            .provider_url
-            .clone();
+        let provider_url = get_chain_info(&chain_name)
+            .ok_or(ERC20Error {
+                message: "get_chain_info none".to_string(),
+            })?
+            .provider_url;
 
         let result = transfer_erc20(to_address, amount, token_address, provider_url).await;
         match result {
@@ -230,21 +185,19 @@ async fn test_transfer_erc20() -> Result<()> {
 
 #[tokio::test]
 async fn test_run() -> Result<()> {
+    use crate::chains::CHAIN_INFOS;
     use rig::completion::Prompt;
     use rig::providers::openai;
 
     // Create OpenAI client and model
     let openai_client = openai::Client::from_url("sk-xxxxx", "https://api.xxxxx.xx/");
 
-    // load chain configs
-    let chain_tokens: Vec<ChainWithTokens> = serde_json::from_str(CHAIN_WITH_TOKENS).unwrap();
-
     //Qwen/Qwen2.5-32B-Instruct
     //Qwen/Qwen2.5-72B-Instruct-128K
     let transfer_agent = openai_client
         .agent("Qwen/Qwen2.5-32B-Instruct")
         .preamble("You are a transfer agent here to help the user perform ERC20 token transfers.")
-        .context(&serde_json::to_string(&chain_tokens).unwrap())
+        .context(&serde_json::to_string(&*CHAIN_INFOS).unwrap())
         .max_tokens(2048)
         .tool(ERC20Transfer)
         .build();

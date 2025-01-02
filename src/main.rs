@@ -1,7 +1,11 @@
-mod agent_with_erc20;
+mod erc20_transfer;
+mod eth_transfer;
+mod swap;
+mod chains;
 mod gen_tools;
-use agent_with_erc20::{ChainWithTokens, ERC20Transfer, CHAIN_WITH_TOKENS};
+use erc20_transfer::ERC20Transfer;
 use anyhow::Result;
+use chains::CHAIN_INFOS;
 use rig::completion::Prompt;
 use rig::providers::openai;
 
@@ -10,13 +14,11 @@ async fn main() -> Result<()> {
     // Create OpenAI client and model
     let openai_client = openai::Client::from_url("sk-xxxxx", "https://api.xxxxx.xx/");
 
-    // load chain configs
-    let chain_tokens: Vec<ChainWithTokens> = serde_json::from_str(CHAIN_WITH_TOKENS).unwrap();
-
+    // agent
     let transfer_agent = openai_client
         .agent("Qwen/Qwen2.5-32B-Instruct")
         .preamble("You are a transfer agent here to help the user perform ERC20 token transfers.")
-        .context(&serde_json::to_string(&chain_tokens).unwrap())
+        .context(&serde_json::to_string(&*CHAIN_INFOS).unwrap())
         .max_tokens(2048)
         .tool(ERC20Transfer)
         .build();

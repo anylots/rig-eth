@@ -2661,6 +2661,7 @@ version = "0.1.0"
 dependencies = [
  "alloy",
  "anyhow",
+ "once_cell",
  "rig-core",
  "serde",
  "serde_json",

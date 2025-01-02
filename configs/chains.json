@@ -1,0 +1,63 @@
+[
+    {
+        "chain": "ethereum",
+        "provider_url": "https://eth-mainnet.g.alchemy.com/v2/YOUR-API-KEY",
+        "tokens": {
+            "USDC": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+            "LINK": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
+            "WETH": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+        },
+        "swap_router": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+    },
+    {
+        "chain": "arbitrum",
+        "provider_url": "https://arb-mainnet.g.alchemy.com/v2/YOUR-API-KEY",
+        "tokens": {
+            "USDC": "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8",
+            "LINK": "0xf97f4df75117a78c1A5a0DBb814Af92458539FB4",
+            "WETH": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"
+        },
+        "swap_router": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+    },
+    {
+        "chain": "base",
+        "provider_url": "http://localhost:8545",
+        "tokens": {
+            "USDC": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "WBTC": "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
+            "WETH": "0x4200000000000000000000000000000000000006"
+        },
+        "swap_router": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+    },
+    {
+        "chain": "zksync",
+        "provider_url": "https://arb-mainnet.g.alchemy.com/v2/YOUR-API-KEY",
+        "tokens": {
+            "USDC": "0x1d17CBcF0D6D143135aE902365D2E5e2A16538D4",
+            "LINK": "0x082faDe8b84B18C441d506e1D3a43a387Cc59D20",
+            "WETH": "0xf00DAD97284D0c6F06dc4Db3c32454D4292c6813",
+            "ZK": "0x5A7d6b2F92C77FAD6CCaBd7EE0624E64907Eaf3E"
+        },
+        "swap_router": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+    },
+    {
+        "chain": "sepolia",
+        "provider_url": "https://eth-mainnet.g.alchemy.com/v2/YOUR-API-KEY",
+        "tokens": {
+            "USDT": "0xbDeaD2A70Fe794D2f97b37EFDE497e68974a296d",
+            "LINK": "0xb227f007804c16546Bd054dfED2E7A1fD5437678",
+            "WETH": "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9"
+        },
+        "swap_router": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+    },
+    {
+        "chain": "local",
+        "provider_url": "http://localhost:8545",
+        "tokens": {
+            "USDC": "5FbDB2315678afecb367f032d93F642f64180aa3",
+            "LINK": "0xb227f007804c16546Bd054dfED2E7A1fD5437678",
+            "WETH": "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9"
+        },
+        "swap_router": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+    }
+]

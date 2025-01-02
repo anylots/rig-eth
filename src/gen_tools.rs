@@ -1,3 +1,4 @@
+
 #[tokio::test]
 
 async fn gen_agent_tool() {
@@ -10,11 +11,13 @@ async fn gen_agent_tool() {
     use std::env;
     use std::{fs, path::Path};
 
-    let cargo_home = env::var("CARGO_HOME").unwrap(); // default ~/.cargo
-    let file_path = format!(
-        "{}/registry/src/index.crates.io-6f17d22bba15001f/rig-core-0.6.0/examples/agent_with_tools.rs",
-        cargo_home
-    );
+    // let cargo_home = env::var("CARGO_HOME").unwrap(); // default ~/.cargo
+    // let file_path = format!(
+    //     "{}/registry/src/index.crates.io-6f17d22bba15001f/rig-core-0.6.0/examples/agent_with_tools.rs",
+    //     cargo_home
+    // );
+
+    let file_path = "src/agent_with_erc20.rs";
 
     // Check if a file exists
     if Path::new(&file_path).exists() {
@@ -37,7 +40,7 @@ async fn gen_agent_tool() {
 
     //Qwen/Qwen2.5-32B-Instruct
     //Qwen/Qwen2.5-72B-Instruct-128K
-    let model = openai_client.completion_model("Qwen/Qwen2.5-32B-Instruct");
+    let model = openai_client.completion_model("Qwen/Qwen2.5-Coder-32B-Instruct");
 
     // Load in all the rust examples
     // let data = FileLoader::with_dir("cargo/registry/src/index.crates.io-6f17d22bba15001f/rig-core-0.6.0/examples").unwrap();
@@ -59,7 +62,7 @@ async fn gen_agent_tool() {
     // Prompt the agent and print the response
     // According to the given examples,
     let response = agent
-        .prompt("Please refer to the example to implement an erc20 transfer agent tool with alloy dependency library. The input parameters need to be tokenAddress, toAddress, amount, and privateKey read from env.")
+        .prompt("Please refer to the example to implement an eth swap to erc20 token agent tool.")
         .await
         .unwrap();
 
