@@ -1,9 +1,5 @@
-mod erc20_transfer;
-mod eth_transfer;
-mod swap;
+use rig_eth::erc20_transfer::ERC20Transfer;
 mod chains;
-mod gen_tools;
-use erc20_transfer::ERC20Transfer;
 use anyhow::Result;
 use chains::CHAIN_INFOS;
 use rig::completion::Prompt;

@@ -1,12 +1,11 @@
 use rig::{completion::ToolDefinition, tool::Tool};
-use std::{str::FromStr, sync::Arc};
+use std::str::FromStr;
 
-use crate::chains::get_chain_info;
+use crate::{chains::get_chain_info, wallet::send_tx};
 use alloy::{
-    network::EthereumWallet,
     primitives::{Address, TxHash, B256, U256},
     providers::{ProviderBuilder, RootProvider},
-    signers::local::PrivateKeySigner,
+    rpc::types::TransactionRequest,
     sol,
     transports::http::{Client, Http},
 };
@@ -122,44 +121,27 @@ async fn transfer_erc20(
     token_address: Address,
     provider_url: String,
 ) -> std::result::Result<B256, anyhow::Error> {
-    // Read the private key from the environment variable
-    // let private_key = env::var("PRIVATE_KEY").unwrap();
-
-    // [RISK WARNING! Writing a private key in the code file is insecure behavior.]
-    // The following code is for testing only. Set up signer from private key, be aware of danger.
-    let private_key = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
-    let signer: PrivateKeySigner = private_key.parse().expect("parse PrivateKeySigner");
-    let wallet: EthereumWallet = EthereumWallet::from(signer.clone());
-
     // Create a http client to the EVM chain network.
     let provider: RootProvider<Http<Client>> =
-        ProviderBuilder::new().on_http(provider_url.parse().expect("parse l1_rpc to Url"));
-
-    // Create eth signer.
-    let signer = Arc::new(
-        ProviderBuilder::new()
-            .with_recommended_fillers()
-            .wallet(wallet)
-            .on_provider(provider.clone()),
-    );
+        ProviderBuilder::new().on_http(provider_url.parse().expect("parse provider_url to Url"));
 
     // Create contract instance.
-    let erc20 = IERC20::IERC20Instance::new(token_address, signer);
+    let erc20 = IERC20::IERC20Instance::new(token_address, provider.clone());
 
     // Sync send transfer call.
     let tx_hash: std::result::Result<TxHash, anyhow::Error> = async move {
         let handle = tokio::task::spawn_blocking(move || {
             let result = tokio::runtime::Handle::current().block_on(async {
                 let decimal = erc20.decimals().call().await.unwrap()._0;
-                erc20
+                let request: TransactionRequest = erc20
                     .transfer(to_address, U256::from(amount * 10u128.pow(decimal.into())))
-                    .send()
-                    .await
+                    .into_transaction_request();
+                send_tx(request, provider).await
             });
             result
         });
         match handle.await {
-            Ok(Ok(tx)) => Ok(tx.tx_hash().clone()),
+            Ok(Ok(tx)) => Ok(tx.transaction_hash.clone()),
             Ok(Err(e)) => Err(anyhow!(format!("alloy rpc error: {}", e))), // sign_transaction
             Err(e) => Err(anyhow!(format!("tokio exec error: {}", e))),    // spawn_blocking
         }

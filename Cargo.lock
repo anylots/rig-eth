@@ -2656,11 +2656,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "rig-test"
+name = "rig-eth"
 version = "0.1.0"
 dependencies = [
  "alloy",
  "anyhow",
+ "log",
  "once_cell",
  "rig-core",
  "serde",
