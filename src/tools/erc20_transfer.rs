@@ -1,7 +1,7 @@
 use rig::{completion::ToolDefinition, tool::Tool};
 use std::str::FromStr;
 
-use crate::{chains::get_chain_info, wallet::send_tx};
+use crate::{chains::get_chain_info, wallets::send_tx};
 use alloy::{
     primitives::{Address, TxHash, B256, U256},
     providers::{ProviderBuilder, RootProvider},
