@@ -142,8 +142,8 @@ async fn transfer_erc20(
         });
         match handle.await {
             Ok(Ok(tx)) => Ok(tx.transaction_hash.clone()),
-            Ok(Err(e)) => Err(anyhow!(format!("alloy rpc error: {}", e))), // sign_transaction
-            Err(e) => Err(anyhow!(format!("tokio exec error: {}", e))),    // spawn_blocking
+            Ok(Err(e)) => Err(anyhow!(format!("alloy rpc error: {}", e))),
+            Err(e) => Err(anyhow!(format!("tokio exec error: {}", e))),
         }
     }
     .await;

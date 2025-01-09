@@ -142,8 +142,8 @@ async fn transfer_eth(
         });
         match handle.await {
             Ok(Ok(tx)) => Ok(tx.tx_hash().clone()),
-            Ok(Err(e)) => Err(anyhow!(format!("alloy rpc error: {}", e))), // sign_transaction
-            Err(e) => Err(anyhow!(format!("tokio exec error: {}", e))),    // spawn_blocking
+            Ok(Err(e)) => Err(anyhow!(format!("alloy rpc error: {}", e))),
+            Err(e) => Err(anyhow!(format!("tokio exec error: {}", e))),
         }
     }
     .await;
@@ -167,8 +167,6 @@ async fn test_run_eth() -> Result<()> {
     // Create OpenAI client and model
     let openai_client = openai::Client::from_url("sk-xxxxx", "https://api.xxxxx.xx/");
 
-    //Qwen/Qwen2.5-32B-Instruct
-    //Qwen/Qwen2.5-72B-Instruct-128K
     let transfer_agent = openai_client
         .agent("Qwen/Qwen2.5-32B-Instruct")
         .preamble("You are a transfer agent here to help the user perform ETH transfers.")
